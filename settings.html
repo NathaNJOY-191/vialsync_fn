@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VitalSync - Settings</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            height: 100vh;
+            background: white;
+            padding: 30px 20px;
+            position: fixed;
+            left: 0;
+            top: 0;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+        
+        .logo h2 {
+            color: #FF6B6B;
+            font-weight: 700;
+            font-size: 24px;
+            letter-spacing: 1px;
+            margin-left: 10px;
+        }
+        
+        .menu {
+            list-style: none;
+            padding: 0;
+            margin-top: 10px;
+            flex-grow: 1;
+        }
+        
+        .menu li {
+            margin: 8px 0;
+        }
+        
+        .menu li a {
+            text-decoration: none;
+            color: #555;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .menu li a i {
+            margin-right: 12px;
+            font-size: 18px;
+        }
+        
+        .menu li a:hover {
+            background: #fff5f5;
+            color: #FF6B6B;
+        }
+        
+        .menu li a.active {
+            background: #FF6B6B;
+            color: white;
+            box-shadow: 0 5px 10px rgba(255, 107, 107, 0.2);
+        }
+        
+        .user-profile {
+            display: flex;
+            align-items: center;
+            padding: 15px 0;
+            border-top: 1px solid #f1f1f1;
+            cursor: pointer;
+        }
+        
+        .user-profile img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+            background: #eee;
+        }
+        
+        .user-info {
+            flex-grow: 1;
+        }
+        
+        .user-info h4 {
+            font-size: 14px;
+            margin: 0;
+            color: #333;
+        }
+        
+        .user-info p {
+            font-size: 12px;
+            color: #888;
+            margin: 0;
+        }
+        
+        /* Popup Styling */
+        .popup-container {
+            display: none;
+            position: absolute;
+            background-color: white;
+            border: 1px solid #ccc;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 10px;
+            z-index: 1000;
+            border-radius: 18px;
+            width: 200px;
+            bottom: 80px;
+            left: 20px;
+        }
+        
+        .popup-content ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .popup-content ul li {
+            padding: 8px 12px;
+        }
+        
+        .popup-content ul li a {
+            text-decoration: none;
+            color: #333;
+            display: block;
+        }
+        
+        .popup-content ul li:hover {
+            background-color: #f1f1f1;
+            border-radius: 4px;
+        }
+        
+        /* Main Content */
+        .main-content {
+            margin-left: 260px;
+            padding: 30px;
+            width: calc(100% - 260px);
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            color: #333;
+            font-weight: 600;
+        }
+        
+        /* Settings Sections */
+        .settings-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 20px;
+        }
+        
+        .settings-card {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .settings-card h3 {
+            font-size: 18px;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .settings-card h3 i {
+            margin-right: 10px;
+            color: #FF6B6B;
+        }
+        
+        .setting-group {
+            margin-bottom: 20px;
+        }
+        
+        .setting-group:last-child {
+            margin-bottom: 0;
+        }
+        
+        .setting-item {
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .setting-item label {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .setting-item input[type="text"],
+        .setting-item input[type="email"],
+        .setting-item input[type="password"],
+        .setting-item select {
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+        }
+        
+        .setting-item input:focus,
+        .setting-item select:focus {
+            outline: none;
+            border-color: #FF6B6B;
+        }
+        
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .toggle-label {
+            font-size: 14px;
+            color: #555;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .toggle-slider {
+            background-color: #FF6B6B;
+        }
+        
+        input:checked + .toggle-slider:before {
+            transform: translateX(26px);
+        }
+        
+        .threshold-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .threshold-input {
+            width: 70px;
+        }
+        
+        .range-container {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            margin-top: 10px;
+        }
+        
+        .range-slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 5px;
+            border-radius: 5px;
+            background: #ddd;
+            outline: none;
+        }
+        
+        .range-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: #FF6B6B;
+            cursor: pointer;
+        }
+        
+        .range-values {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #888;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+            border: none;
+        }
+        
+        .primary-btn {
+            background: #FF6B6B;
+            color: white;
+        }
+        
+        .secondary-btn {
+            background: #f5f5f5;
+            color: #555;
+        }
+        
+        .divider {
+            height: 1px;
+            background: #eee;
+            margin: 15px 0;
+        }
+        
+        .danger-zone {
+            border: 1px dashed #ff3333;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        
+        .danger-zone h4 {
+            color: #ff3333;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        
+        .danger-zone p {
+            font-size: 13px;
+            color: #555;
+            margin-bottom: 15px;
+        }
+        
+        .danger-btn {
+            background: #ffe6e6;
+            color: #ff3333;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 991px) {
+            .sidebar {
+                width: 70px;
+                padding: 20px 10px;
+            }
+            
+            .logo h2, .menu li a span, .user-info {
+                display: none;
+            }
+            
+            .menu li a {
+                justify-content: center;
+                padding: 12px;
+            }
+            
+            .menu li a i {
+                margin-right: 0;
+            }
+            
+            .main-content {
+                margin-left: 70px;
+                width: calc(100% - 70px);
+            }
+            
+            .user-profile {
+                justify-content: center;
+            }
+            
+            .user-profile img {
+                margin-right: 0;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .settings-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">
+            <i class="fas fa-heartbeat" style="color: #FF6B6B; font-size: 24px;"></i>
+            <h2>VitalSync</h2>
+        </div>
+        <ul class="menu">
+            <li><a href="home.html"><i class="fas fa-chart-line"></i> <span>Dashboard</span></a></li>
+            <li><a href="live.html"><i class="fas fa-heartbeat"></i> <span>Live Data</span></a></li>
+            <li><a href="alerts.html"><i class="fas fa-bell"></i> <span>Alerts</span></a></li>
+            <li><a href="history.html"><i class="fas fa-history"></i> <span>History</span></a></li>
+          
+        </ul>
+        <div class="user-profile" onclick="togglePopup()">
+            <img src="images.jpeg" alt="User">
+            <div class="user-info">
+                <h4>John Doe</h4>
+                <p>Patient</p>
+            </div>
+        </div>
+        <!-- Popup Container -->
+        <div id="popup" class="popup-container">
+            <div class="popup-content">
+                <ul>
+                    <li><a href="profile.html">Profile</a></li>
+                    <li><a href="settings.html">Settings</a></li>
+                    <li><a href="registration.html">Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="header">
+            <h1>Settings</h1>
+        </div>
+        
+        <div class="settings-container">
+            <!-- Account Settings -->
+            <div class="settings-card">
+                <h3><i class="fas fa-user-circle"></i> Account Settings</h3>
+                
+                <div class="setting-group">
+                    <div class="setting-item">
+                        <label for="fullName">Full Name</label>
+                        <input type="text" id="fullName" value="John Doe">
+                    </div>
+                    <div class="setting-item">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" value="john.doe@example.com">
+                    </div>
+                    <div class="setting-item">
+                        <label for="phone">Phone Number</label>
+                        <input type="text" id="phone" value="+1 (555) 123-4567">
+                    </div>
+                </div>
+                
+                <div class="divider"></div>
+                
+                <div class="setting-group">
+                    <div class="setting-item">
+                        <label for="oldPassword">Current Password</label>
+                        <input type="password" id="oldPassword" placeholder="Enter current password">
+                    </div>
+                    <div class="setting-item">
+                        <label for="newPassword">New Password</label>
+                        <input type="password" id="newPassword" placeholder="Enter new password">
+                    </div>
+                    <div class="setting-item">
+                        <label for="confirmPassword">Confirm New Password</label>
+                        <input type="password" id="confirmPassword" placeholder="Confirm new password">
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn primary-btn">Save Changes</button>
+                    <button class="btn secondary-btn">Cancel</button>
+                </div>
+            </div>
+            
+            <!-- Notification Settings -->
+            <div class="settings-card">
+                <h3><i class="fas fa-bell"></i> Notification Settings</h3>
+                
+                <div class="setting-group">
+                    <div class="setting-item toggle-container">
+                        <span class="toggle-label">Email Notifications</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="setting-item toggle-container">
+                        <span class="toggle-label">SMS Notifications</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="setting-item toggle-container">
+                        <span class="toggle-label">Push Notifications</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="divider"></div>
+                
+                <div class="setting-group">
+                    <div class="setting-item">
+                        <label>Alert Frequency</label>
+                        <select>
+                            <option>Immediately</option>
+                            <option>Every 15 minutes</option>
+                            <option>Every hour</option>
+                            <option>Daily summary</option>
+                        </select>
+                    </div>
+                    <div class="setting-item toggle-container">
+                        <span class="toggle-label">Weekly Health Report</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn primary-btn">Save Changes</button>
+                    <button class="btn secondary-btn">Reset to Default</button>
+                </div>
+            </div>
+            
+            <!-- Health Metrics Settings -->
+            <div class="settings-card">
+                <h3><i class="fas fa-heartbeat"></i> Health Metrics Settings</h3>
+                
+                <div class="setting-group">
+                    <div class="setting-item">
+                        <label>Heart Rate Alert Thresholds</label>
+                        <div class="threshold-container">
+                            <span>Low:</span>
+                            <input type="number" class="threshold-input" value="50"> BPM
+                        </div>
+                        <div class="threshold-container">
+                            <span>High:</span>
+                            <input type="number" class="threshold-input" value="100"> BPM
+                        </div>
+                        <div class="range-container">
+                            <input type="range" min="30" max="220" value="50" class="range-slider" id="hrLowRange">
+                            <div class="range-values">
+                                <span>30</span>
+                                <span>220</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <label>SpO₂ Alert Threshold</label>
+                        <div class="threshold-container">
+                            <span>Below:</span>
+                            <input type="number" class="threshold-input" value="95"> %
+                        </div>
+                        <div class="range-container">
+                            <input type="range" min="80" max="100" value="95" class="range-slider" id="spo2Range">
+                            <div class="range-values">
+                                <span>80%</span>
+                                <span>100%</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <label>Temperature Alert Thresholds</label>
+                        <div class="threshold-container">
+                            <span>Low:</span>
+                            <input type="number" class="threshold-input" value="97.0"> °F
+                        </div>
+                        <div class="threshold-container">
+                            <span>High:</span>
+                            <input type="number" class="threshold-input" value="99.5"> °F
+                        </div>
+                        <div class="range-container">
+                            <input type="range" min="94" max="105" value="97" class="range-slider" id="tempLowRange">
+                            <div class="range-values">
+                                <span>94°F</span>
+                                <span>105°F</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="divider"></div>
+                
+                <div class="setting-item">
+                    <label>Measurement Units</label>
+                    <select>
+                        <option>US (°F, lb, in)</option>
+                        <option>Metric (°C, kg, cm)</option>
+                    </select>
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn primary-btn">Save Changes</button>
+                    <button class="btn secondary-btn">Reset to Default</button>
+                </div>
+            </div>
+            
+            <!-- Data Management -->
+            <div class="settings-card">
+                <h3><i class="fas fa-database"></i> Data Management</h3>
+                
+                <div class="setting-group">
+                    <div class="setting-item">
+                        <label>Data Storage Period</label>
+                        <select>
+                            <option>3 months</option>
+                            <option>6 months</option>
+                            <option selected>1 year</option>
+                            <option>2 years</option>
+                            <option>Indefinite</option>
+                        </select>
+                    </div>
+                    
+                    <div class="setting-item toggle-container">
+                        <span class="toggle-label">Automatic Data Backup</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <label>Backup Frequency</label>
+                        <select>
+                            <option>Daily</option>
+                            <option selected>Weekly</option>
+                            <option>Monthly</option>
+                        </select>
+                    </div>
+                    
+                    <div class="setting-item toggle-container">
+                        <span class="toggle-label">Share Data with Healthcare Provider</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn primary-btn">Export All Data</button>
+                    <button class="btn secondary-btn">Request Data Report</button>
+                </div>
+                
+                <div class="danger-zone">
+                    <h4>Danger Zone</h4>
+                    <p>Permanently delete all your health data. This action cannot be undone.</p>
+                    <button class="btn danger-btn">Delete All Data</button>
+                </div>
+            </div>
+            
+            <!-- Device Settings -->
+            <div class="settings-card">
+                <h3><i class="fas fa-mobile-alt"></i> Device Settings</h3>
+                
+                <div class="setting-group">
+                    <div class="setting-item">
+                        <label>Connected Devices</label>
+                        <div style="margin-top: 10px;">
+                            <div style="display: flex; justify-content: space-between; padding: 10px; background: #f9f9f9; border-radius: 8px; margin-bottom: 10px;">
+                                <div>
+                                    <strong>VitalSync Wristband</strong>
+                                    <div style="font-size: 12px; color: #888;">Last synced: Today, 10:30 AM</div>
+                                </div>
+                                <span style="color: #00cc66; font-weight: 500;">Connected</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 10px; background: #f9f9f9; border-radius: 8px;">
+                                <div>
+                                    <strong>Smart Scale XR-100</strong>
+                                    <div style="font-size: 12px; color: #888;">Last synced: Yesterday, 08:15 AM</div>
+                                </div>
+                                <span style="color: #00cc66; font-weight: 500;">Connected</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="divider"></div>
+                
+                <div class="setting-group">
+                    <div class="setting-item toggle-container">
+                        <span class="toggle-label">Auto Sync When Connected</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <label>Sync Frequency</label>
+                        <select>
+                            <option>Every 15 minutes</option>
+                            <option selected>Every hour</option>
+                            <option>Every 3 hours</option>
+                            <option>Every 6 hours</option>
+                        </select>
+                    </div>
+                    
+                    <div class="setting-item toggle-container">
+                        <span class="toggle-label">Sync Over Cellular Data</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn primary-btn">Add New Device</button>
+                    <button class="btn secondary-btn">Sync Now</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // JavaScript for Popup Functionality
+        function togglePopup() {
+            const popup = document.getElementById("popup");
+            if (popup.style.display === "block") {
+                popup.style.display = "none";
+            } else {
+                popup.style.display = "block";
+            }
+        }
+        
+        // Close the popup if clicked outside
+        window.onclick = function(event) {
+            const popup = document.getElementById("popup");
+            if (event.target !== popup && !event.target.closest('.user-profile')) {
+                popup.style.display = "none";
+            }
+        }
+        
+        // Update range sliders
+        const hrLowRange = document.getElementById('hrLowRange');
+        const spo2Range = document.getElementById('spo2Range');
+        const tempLowRange = document.getElementById('tempLowRange');
+        
+        hrLowRange.addEventListener('input', function() {
+            const lowHeartRateInput = document.querySelector('.threshold-container:nth-child(2) input');
+            lowHeartRateInput.value = this.value;
+        });
+        
+        spo2Range.addEventListener('input', function() {
+            const spo2Input = document.querySelector('.threshold-container input');
+            spo2Input.value = this.value;
+        });
+        
+        tempLowRange.addEventListener('input', function() {
+            const lowTempInput = document.querySelector('.threshold-container:nth-child(5) input');
+            lowTempInput.value = this.value;
+        });
+        
+        // Initialize numeric inputs to update sliders
+        const thresholdInputs = document.querySelectorAll('.threshold-input');
+        thresholdInputs.forEach(input => {
+            input.addEventListener('change', function() {
+                // Find the corresponding slider and update it
+                const parentDiv = this.closest('.setting-item');
+                const slider = parentDiv.querySelector('.range-slider');
+                if (slider) {
+                    slider.value = this.value;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

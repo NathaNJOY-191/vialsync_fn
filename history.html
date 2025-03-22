@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VitalSync - Health History</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            height: 100vh;
+            background: white;
+            padding: 30px 20px;
+            position: fixed;
+            left: 0;
+            top: 0;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+        
+        .logo h2 {
+            color: #FF6B6B;
+            font-weight: 700;
+            font-size: 24px;
+            letter-spacing: 1px;
+            margin-left: 10px;
+        }
+        
+        .menu {
+            list-style: none;
+            padding: 0;
+            margin-top: 10px;
+            flex-grow: 1;
+        }
+        
+        .menu li {
+            margin: 8px 0;
+        }
+        
+        .menu li a {
+            text-decoration: none;
+            color: #555;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .menu li a i {
+            margin-right: 12px;
+            font-size: 18px;
+        }
+        
+        .menu li a:hover {
+            background: #fff5f5;
+            color: #FF6B6B;
+        }
+        
+        .menu li a.active {
+            background: #FF6B6B;
+            color: white;
+            box-shadow: 0 5px 10px rgba(255, 107, 107, 0.2);
+        }
+        
+        .user-profile {
+            display: flex;
+            align-items: center;
+            padding: 15px 0;
+            border-top: 1px solid #f1f1f1;
+            cursor: pointer;
+        }
+        
+        .user-profile img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+            background: #eee;
+        }
+        
+        .user-info {
+            flex-grow: 1;
+        }
+        
+        .user-info h4 {
+            font-size: 14px;
+            margin: 0;
+            color: #333;
+        }
+        
+        .user-info p {
+            font-size: 12px;
+            color: #888;
+            margin: 0;
+        }
+        
+        /* Popup Styling */
+        .popup-container {
+            display: none;
+            position: absolute;
+            background-color: white;
+            border: 1px solid #ccc;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 10px;
+            z-index: 1000;
+            border-radius: 18px;
+            width: 200px;
+            bottom: 80px;
+            left: 20px;
+        }
+        
+        .popup-content ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .popup-content ul li {
+            padding: 8px 12px;
+        }
+        
+        .popup-content ul li a {
+            text-decoration: none;
+            color: #333;
+            display: block;
+        }
+        
+        .popup-content ul li:hover {
+            background-color: #f1f1f1;
+            border-radius: 4px;
+        }
+        
+        /* Main Content */
+        .main-content {
+            margin-left: 260px;
+            padding: 30px;
+            width: calc(100% - 260px);
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            color: #333;
+            font-weight: 600;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .header-btn {
+            background: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        
+        .header-btn i {
+            margin-right: 8px;
+            color: #FF6B6B;
+        }
+        
+        /* Filter and Date Range Section */
+        .filters {
+            background: white;
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .filter-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        
+        .date-range {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .date-range label {
+            font-size: 14px;
+            color: #555;
+            font-weight: 500;
+        }
+        
+        .date-input {
+            padding: 8px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .filter-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .filter-btn {
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+        }
+        
+        .apply-btn {
+            background: #FF6B6B;
+            color: white;
+            border: none;
+        }
+        
+        .reset-btn {
+            background: transparent;
+            color: #555;
+            border: 1px solid #ddd;
+        }
+        
+        .filter-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .metrics-filter {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .metric-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .metric-checkbox input {
+            accent-color: #FF6B6B;
+        }
+        
+        .metric-checkbox label {
+            font-size: 14px;
+            color: #555;
+        }
+        
+        /* History Data Section */
+        .history-section {
+            margin-bottom: 30px;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .section-header h3 {
+            font-size: 20px;
+            color: #333;
+            font-weight: 600;
+        }
+        
+        .section-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .section-btn {
+            background: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            font-size: 13px;
+            color: #555;
+            font-weight: 500;
+        }
+        
+        .section-btn i {
+            margin-right: 8px;
+            color: #FF6B6B;
+        }
+        
+        .history-data {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .data-table th {
+            background: #f9f9f9;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #555;
+            font-size: 14px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .data-table td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            color: #333;
+            font-size: 14px;
+        }
+        
+        .data-table tr:hover {
+            background: #f9f9f9;
+        }
+        
+        .data-table .status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .normal {
+            background: #e6fff2;
+            color: #00cc66;
+        }
+        
+        .warning {
+            background: #fff9e6;
+            color: #ffa500;
+        }
+        
+        .critical {
+            background: #ffe6e6;
+            color: #ff3333;
+        }
+        
+        .view-btn {
+            background: #f0f0f0;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            color: #555;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .view-btn:hover {
+            background: #FF6B6B;
+            color: white;
+        }
+        
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            margin-top: 20px;
+        }
+        
+        .page-item {
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            background: white;
+            color: #555;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        
+        .page-item.active {
+            background: #FF6B6B;
+            color: white;
+        }
+        
+        .page-item:hover:not(.active) {
+            background: #f5f5f5;
+        }
+        
+        /* Charts Section */
+        .charts-section {
+            margin-top: 30px;
+        }
+        
+        .charts-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        
+        .chart-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .chart-header h4 {
+            font-size: 16px;
+            color: #333;
+            font-weight: 600;
+        }
+        
+        .chart-options {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .chart-option {
+            padding: 5px 10px;
+            background: #f5f5f5;
+            border-radius: 20px;
+            font-size: 12px;
+            color: #555;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .chart-option.active {
+            background: #FF6B6B;
+            color: white;
+        }
+        
+        .chart-placeholder {
+            height: 200px;
+            width: 100%;
+            background: #f9f9f9;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #888;
+            font-size: 14px;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 991px) {
+            .sidebar {
+                width: 70px;
+                padding: 20px 10px;
+            }
+            
+            .logo h2, .menu li a span, .user-info {
+                display: none;
+            }
+            
+            .menu li a {
+                justify-content: center;
+                padding: 12px;
+            }
+            
+            .menu li a i {
+                margin-right: 0;
+            }
+            
+            .main-content {
+                margin-left: 70px;
+                width: calc(100% - 70px);
+            }
+            
+            .user-profile {
+                justify-content: center;
+            }
+            
+            .user-profile img {
+                margin-right: 0;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .charts-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .filter-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .date-range {
+                width: 100%;
+                flex-wrap: wrap;
+            }
+            
+            .date-input {
+                width: 100%;
+            }
+            
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">
+            <i class="fas fa-heartbeat" style="color: #FF6B6B; font-size: 24px;"></i>
+            <h2>VitalSync</h2>
+        </div>
+        <ul class="menu">
+            <li><a href="home.html"><i class="fas fa-chart-line"></i> <span>Dashboard</span></a></li>
+            <li><a href="live.html"><i class="fas fa-heartbeat"></i> <span>Live Data</span></a></li>
+            <li><a href="alerts.html"><i class="fas fa-bell"></i> <span>Alerts</span></a></li>
+            <li><a href="history.html" class="active"><i class="fas fa-history"></i> <span>History</span></a></li>
+    
+        </ul>
+        <div class="user-profile" onclick="togglePopup()">
+            <img src="images.jpeg" alt="User">
+            <div class="user-info">
+                <h4>John Doe</h4>
+                <p>Patient</p>
+            </div>
+        </div>
+        <!-- Popup Container -->
+        <div id="popup" class="popup-container">
+            <div class="popup-content">
+                <ul>
+                    <li><a href="profile.html">Profile</a></li>
+                    <li><a href="settings.html">Settings</a></li>
+                    <li><a href="registration.html">Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="header">
+            <h1>Health History</h1>
+            <div class="header-actions">
+                <button class="header-btn"><i class="fas fa-download"></i> Export Data</button>
+                <button class="header-btn"><i class="fas fa-print"></i> Print</button>
+            </div>
+        </div>
+
+        <!-- Filters Section -->
+        <section class="filters">
+            <div class="filter-row">
+                <div class="date-range">
+                    <label>Date Range:</label>
+                    <input type="date" class="date-input" value="2025-02-10">
+                    <span>to</span>
+                    <input type="date" class="date-input" value="2025-03-10">
+                </div>
+                <div class="filter-actions">
+                    <button class="filter-btn apply-btn">Apply Filters</button>
+                    <button class="filter-btn reset-btn">Reset</button>
+                </div>
+            </div>
+            <div class="metrics-filter">
+                <div class="metric-checkbox">
+                    <input type="checkbox" id="ecg" checked>
+                    <label for="ecg">ECG</label>
+                </div>
+                <div class="metric-checkbox">
+                    <input type="checkbox" id="heart-rate" checked>
+                    <label for="heart-rate">Heart Rate</label>
+                </div>
+                <div class="metric-checkbox">
+                    <input type="checkbox" id="spo2" checked>
+                    <label for="spo2">SpO₂</label>
+                </div>
+                <div class="metric-checkbox">
+                    <input type="checkbox" id="temperature" checked>
+                    <label for="temperature">Temperature</label>
+                </div>
+            </div>
+        </section>
+
+        <!-- History Data Table -->
+        <section class="history-section">
+            <div class="section-header">
+                <h3>Health Records</h3>
+                <div class="section-actions">
+                    <button class="section-btn"><i class="fas fa-filter"></i> Filter</button>
+                    <button class="section-btn"><i class="fas fa-sort"></i> Sort</button>
+                </div>
+            </div>
+            <div class="history-data">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Date & Time</th>
+                            <th>ECG</th>
+                            <th>Heart Rate</th>
+                            <th>SpO₂</th>
+                            <th>Temperature</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Mar 10, 2025 - 09:30 AM</td>
+                            <td>Normal</td>
+                            <td>72 BPM</td>
+                            <td>98%</td>
+                            <td>98.6°F</td>
+                            <td><span class="status normal">Normal</span></td>
+                            <td><button class="view-btn">View Details</button></td>
+                        </tr>
+                        <tr>
+                            <td>Mar 09, 2025 - 10:15 AM</td>
+                            <td>Normal</td>
+                            <td>74 BPM</td>
+                            <td>97%</td>
+                            <td>98.4°F</td>
+                            <td><span class="status normal">Normal</span></td>
+                            <td><button class="view-btn">View Details</button></td>
+                        </tr>
+                        <tr>
+                            <td>Mar 08, 2025 - 08:45 AM</td>
+                            <td>Irregular</td>
+                            <td>88 BPM</td>
+                            <td>96%</td>
+                            <td>99.1°F</td>
+                            <td><span class="status warning">Warning</span></td>
+                            <td><button class="view-btn">View Details</button></td>
+                        </tr>
+                        <tr>
+                            <td>Mar 07, 2025 - 09:00 AM</td>
+                            <td>Normal</td>
+                            <td>76 BPM</td>
+                            <td>97%</td>
+                            <td>98.6°F</td>
+                            <td><span class="status normal">Normal</span></td>
+                            <td><button class="view-btn">View Details</button></td>
+                        </tr>
+                        <tr>
+                            <td>Mar 06, 2025 - 08:30 AM</td>
+                            <td>Normal</td>
+                            <td>70 BPM</td>
+                            <td>98%</td>
+                            <td>98.2°F</td>
+                            <td><span class="status normal">Normal</span></td>
+                            <td><button class="view-btn">View Details</button></td>
+                        </tr>
+                        <tr>
+                            <td>Mar 05, 2025 - 10:30 AM</td>
+                            <td>Abnormal</td>
+                            <td>105 BPM</td>
+                            <td>94%</td>
+                            <td>100.2°F</td>
+                            <td><span class="status critical">Critical</span></td>
+                            <td><button class="view-btn">View Details</button></td>
+                        </tr>
+                        <tr>
+                            <td>Mar 04, 2025 - 09:15 AM</td>
+                            <td>Normal</td>
+                            <td>78 BPM</td>
+                            <td>97%</td>
+                            <td>98.8°F</td>
+                            <td><span class="status normal">Normal</span></td>
+                            <td><button class="view-btn">View Details</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="pagination">
+                    <div class="page-item"><i class="fas fa-chevron-left"></i></div>
+                    <div class="page-item active">1</div>
+                    <div class="page-item">2</div>
+                    <div class="page-item">3</div>
+                    <div class="page-item">...</div>
+                    <div class="page-item">10</div>
+                    <div class="page-item"><i class="fas fa-chevron-right"></i></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Charts Section -->
+        <section class="charts-section">
+            <div class="section-header">
+                <h3>Health Trends</h3>
+                <div class="section-actions">
+                    <button class="section-btn"><i class="fas fa-download"></i> Export Charts</button>
+                </div>
+            </div>
+            <div class="charts-container">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h4>Heart Rate Trend</h4>
+                        <div class="chart-options">
+                            <span class="chart-option active">Week</span>
+                            <span class="chart-option">Month</span>
+                            <span class="chart-option">Year</span>
+                        </div>
+                    </div>
+                    <div class="chart-placeholder">
+                        <i class="fas fa-chart-line" style="margin-right: 10px; color: #FF6B6B;"></i> Heart Rate Chart
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h4>SpO₂ Levels</h4>
+                        <div class="chart-options">
+                            <span class="chart-option active">Week</span>
+                            <span class="chart-option">Month</span>
+                            <span class="chart-option">Year</span>
+                        </div>
+                    </div>
+                    <div class="chart-placeholder">
+                        <i class="fas fa-chart-area" style="margin-right: 10px; color: #FF6B6B;"></i> SpO₂ Chart
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h4>Temperature Variations</h4>
+                        <div class="chart-options">
+                            <span class="chart-option active">Week</span>
+                            <span class="chart-option">Month</span>
+                            <span class="chart-option">Year</span>
+                        </div>
+                    </div>
+                    <div class="chart-placeholder">
+                        <i class="fas fa-chart-bar" style="margin-right: 10px; color: #FF6B6B;"></i> Temperature Chart
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h4>ECG Readings</h4>
+                        <div class="chart-options">
+                            <span class="chart-option active">Week</span>
+                            <span class="chart-option">Month</span>
+                            <span class="chart-option">Year</span>
+                        </div>
+                    </div>
+                    <div class="chart-placeholder">
+                        <i class="fas fa-heartbeat" style="margin-right: 10px; color: #FF6B6B;"></i> ECG Chart
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // JavaScript for Popup Functionality
+        function togglePopup() {
+            const popup = document.getElementById("popup");
+            if (popup.style.display === "block") {
+                popup.style.display = "none";
+            } else {
+                popup.style.display = "block";
+            }
+        }
+
+        // Close the popup if clicked outside
+        window.onclick = function(event) {
+            const popup = document.getElementById("popup");
+            if (event.target !== popup && !event.target.closest('.user-profile')) {
+                popup.style.display = "none";
+            }
+        }
+    </script>
+</body>
+</html>
